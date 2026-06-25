@@ -7,7 +7,7 @@ export async function GET(request: Request) {
 
   try {
     const response = await fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=cardano&vs_currencies=usd&include_24hr_change=true",
+      "https://api.kraken.com/0/public/Ticker?pair=ADAUSD",
       {
         cache: "no-store",
         headers: { accept: "application/json", "user-agent": "300spo-live/1.0" },
@@ -29,14 +29,28 @@ export async function GET(request: Request) {
     }
 
     const data = (await response.json()) as {
-      cardano?: { usd?: number; usd_24h_change?: number };
+      error?: string[];
+      result?: {
+        ADAUSD?: {
+          c?: [string, string];
+          o?: string;
+        };
+      };
     };
+    const ticker = data.result?.ADAUSD;
+    const last = Number(ticker?.c?.[0]);
+    const open = Number(ticker?.o);
+    const change24h =
+      Number.isFinite(last) && Number.isFinite(open) && open > 0
+        ? ((last - open) / open) * 100
+        : null;
 
     return NextResponse.json(
       {
         fetchedAt: new Date().toISOString(),
-        adaUsd: data.cardano?.usd ?? null,
-        change24h: data.cardano?.usd_24h_change ?? null,
+        adaUsd: Number.isFinite(last) ? last : null,
+        change24h,
+        ...(debug ? { errors: data.error ?? [] } : {}),
       },
       {
         headers: {
