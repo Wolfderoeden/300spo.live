@@ -143,7 +143,7 @@ export function MetricsGrid() {
         sub: `Saturation ${formatPercent(metrics?.pool?.liveSaturation)}`,
       },
       {
-        label: "300 holders",
+        label: "300 token holders",
         value: formatNumber(metrics?.token?.holders),
         sub: `${formatNumber(metrics?.token?.transactions)} asset txs`,
       },
@@ -158,7 +158,7 @@ export function MetricsGrid() {
         sub: `${formatNumber(metrics?.nft?.holderCount)} holders`,
       },
       {
-        label: "DRep voting power",
+        label: "DRep delegated ADA",
         value: formatAda(metrics?.drep?.votingPower),
         sub: `Status ${metrics?.drep?.status ?? "-"}`,
       },
@@ -185,3 +185,40 @@ export function MetricsGrid() {
   );
 }
 
+export function DrepProfileCard() {
+  const [metrics, setMetrics] = useState<Metrics | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+
+    async function refresh() {
+      const metricData = await getJson<Metrics>("/api/metrics");
+      if (alive) {
+        setMetrics(metricData);
+      }
+    }
+
+    refresh();
+    const interval = window.setInterval(refresh, 90_000);
+
+    return () => {
+      alive = false;
+      window.clearInterval(interval);
+    };
+  }, []);
+
+  return (
+    <div className="drep-stat-grid">
+      <MetricCard
+        label="Currently delegated"
+        value={formatAda(metrics?.drep?.votingPower)}
+        sub="Live DRep voting power"
+      />
+      <MetricCard
+        label="DRep status"
+        value={String(metrics?.drep?.status ?? "-")}
+        sub={`Expires epoch ${formatNumber(metrics?.drep?.expiresEpoch)}`}
+      />
+    </div>
+  );
+}

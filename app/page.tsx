@@ -1,8 +1,14 @@
 import { ArrowDown, ArrowUpRight, Shield, Snowflake } from "lucide-react";
-import { LiveTicker, MetricsGrid } from "./components/LiveMetrics";
+import type { CSSProperties } from "react";
+import {
+  DrepProfileCard,
+  LiveTicker,
+  MetricsGrid,
+} from "./components/LiveMetrics";
 import { NewsFeed } from "./components/NewsFeed";
 import { TradePanel } from "./components/TradePanel";
 import { blogPosts } from "./data/blog";
+import { getSitePayload, type MediaItem } from "./lib/content";
 import {
   DREP_ID,
   LEGACY_DREP_ID,
@@ -11,38 +17,87 @@ import {
   TOKEN_ID,
 } from "./lib/constants";
 
-export default function Home() {
+export const runtime = "edge";
+
+function mediaByPlacement(media: MediaItem[], placement: string) {
+  return media.filter((item) => item.isVisible && item.placement === placement);
+}
+
+function MediaTile({ item }: { item: MediaItem }) {
+  return (
+    <figure className="media-tile">
+      {item.contentType.startsWith("video/") ? (
+        <video controls muted playsInline src={item.url} />
+      ) : (
+        <img alt={item.alt || item.filename} src={item.url} />
+      )}
+      {item.alt ? <figcaption>{item.alt}</figcaption> : null}
+    </figure>
+  );
+}
+
+export default async function Home() {
+  const { content, media } = await getSitePayload();
+  const pages = [...content.pages]
+    .filter((page) => page.visible)
+    .sort((a, b) => a.order - b.order);
+  const sections = [...content.sections]
+    .filter((section) => section.visible)
+    .sort((a, b) => a.order - b.order);
+  const ecosystemSection = sections.find((section) => section.id === "ecosystem");
+  const drepSection = sections.find((section) => section.id === "drep-profile");
+  const customSections = sections.filter(
+    (section) => section.id !== "ecosystem" && section.id !== "drep-profile",
+  );
+  const heroMedia = mediaByPlacement(media, "hero")[0];
+  const ecosystemMedia = mediaByPlacement(media, "ecosystem");
+  const drepMedia = mediaByPlacement(media, "drep");
+  const galleryMedia = mediaByPlacement(media, "gallery");
+
   return (
     <main className="site-shell">
       <nav className="nav" aria-label="Primary navigation">
         <a className="brand" href="#top">
           <span className="brand-mark">300</span>
-          <span>300spo.live</span>
+          <span>{content.siteTitle}</span>
         </a>
         <div className="nav-links">
           <a href="#metrics">Metrics</a>
           <a href="#trade">Trade</a>
           <a href="#news">News</a>
           <a href="#blog">Blog</a>
+          {pages.map((page) => (
+            <a href={`/content/${page.slug}`} key={page.id}>
+              {page.navLabel}
+            </a>
+          ))}
+          <a href="/admin">Admin</a>
         </div>
       </nav>
 
-      <section className="hero" id="top">
+      <section
+        className="hero"
+        id="top"
+        style={
+          heroMedia
+            ? ({ "--hero-image": `url("${heroMedia.url}")` } as CSSProperties)
+            : undefined
+        }
+      >
         <div className="hero-noise" />
         <div className="container hero-content">
           <div>
             <span className="eyebrow">
               <span className="status-dot" />
-              Cardano hub for 300
+              {content.hero.eyebrow}
             </span>
-            <h1>300spo.live</h1>
+            <h1>{content.hero.title}</h1>
             <p className="hero-copy">
-              Token, 300 Degens, stake pool, DRep identity, Minswap trading,
-              ADA access, and daily Cardano news in one arctic command center.
+              {content.hero.body}
             </p>
             <div className="hero-actions">
               <a className="pill-link primary-action" href="#trade">
-                Trade 300
+                {content.hero.primaryLabel}
                 <ArrowDown size={16} />
               </a>
               <a
@@ -51,7 +106,7 @@ export default function Home() {
                 target="_blank"
                 rel="noreferrer"
               >
-                View pool
+                {content.hero.secondaryLabel}
                 <ArrowUpRight size={16} />
               </a>
             </div>
@@ -66,8 +121,8 @@ export default function Home() {
             <div>
               <h2>Live metrics</h2>
               <p className="section-lede">
-                On-chain 300, SPO, NFT, and DRep surfaces. Missing reads stay
-                empty and render as a dash.
+                On-chain 300, SPO, NFT, and DRep surfaces. If a read fails, the
+                site renders a dash.
               </p>
             </div>
             <Snowflake aria-hidden />
@@ -80,15 +135,23 @@ export default function Home() {
         <div className="container grid two-grid">
           <div className="glass-card token-visual">
             <div className="token-badge">300</div>
+            {ecosystemMedia.length > 0 ? (
+              <div className="floating-media-strip">
+                {ecosystemMedia.slice(0, 3).map((item) => (
+                  <MediaTile item={item} key={item.id} />
+                ))}
+              </div>
+            ) : null}
           </div>
           <div className="glass-card panel">
             <div className="accent-bar" />
             <span className="label">Ecosystem</span>
-            <h2 className="mt-3">Token, NFTs, SPO, DRep</h2>
+            <h2 className="mt-3">
+              {ecosystemSection?.title ?? "300 Token + 300 Degens"}
+            </h2>
             <p className="copy-block mt-4">
-              The 300 token and 300 Degens collection sit next to the 300 stake
-              pool and the registered DRep identity, so visitors can inspect,
-              stake, trade, buy ADA, and read updates from one place.
+              {ecosystemSection?.body ??
+                "The token and NFT collection are shown together as the public 300 identity, with the SPO and DRep profile connected beside them for live Cardano participation."}
             </p>
             <span className="id-chip">Token ID: {TOKEN_ID}</span>
             <span className="id-chip">DRep: {DREP_ID}</span>
@@ -102,9 +165,101 @@ export default function Home() {
               300 Degens collection
               <ArrowUpRight size={16} />
             </a>
+            {ecosystemSection?.ctaHref && ecosystemSection.ctaLabel ? (
+              <a
+                className="pill-link mt-4"
+                href={ecosystemSection.ctaHref}
+                target={
+                  ecosystemSection.ctaHref.startsWith("http") ? "_blank" : undefined
+                }
+                rel={
+                  ecosystemSection.ctaHref.startsWith("http")
+                    ? "noreferrer"
+                    : undefined
+                }
+              >
+                {ecosystemSection.ctaLabel}
+                <ArrowUpRight size={16} />
+              </a>
+            ) : null}
           </div>
         </div>
       </section>
+
+      <section className="section">
+        <div className="container grid two-grid">
+          <div className="glass-card panel">
+            <div className="accent-bar" />
+            <span className="label">DRep</span>
+            <h2 className="mt-3">{drepSection?.title ?? "DRep profile"}</h2>
+            <p className="copy-block mt-4">
+              {drepSection?.body ??
+                "The profile displays the current ADA delegated to 300 as DRep voting power. It is read from on-chain data and shows a dash if the source cannot be fetched."}
+            </p>
+            <span className="id-chip">DRep: {DREP_ID}</span>
+            <span className="id-chip">Legacy: {LEGACY_DREP_ID}</span>
+          </div>
+          <div>
+            <DrepProfileCard />
+            {drepMedia.length > 0 ? (
+              <div className="media-strip mt-4">
+                {drepMedia.slice(0, 2).map((item) => (
+                  <MediaTile item={item} key={item.id} />
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      {customSections.map((section) => (
+        <section className="section" key={section.id}>
+          <div className="container grid two-grid">
+            <div className="glass-card panel">
+              <div className="accent-bar" />
+              {section.eyebrow ? <span className="label">{section.eyebrow}</span> : null}
+              <h2 className="mt-3">{section.title}</h2>
+              <p className="copy-block mt-4">{section.body}</p>
+              {section.ctaHref && section.ctaLabel ? (
+                <a
+                  className="pill-link mt-4"
+                  href={section.ctaHref}
+                  target={section.ctaHref.startsWith("http") ? "_blank" : undefined}
+                  rel={section.ctaHref.startsWith("http") ? "noreferrer" : undefined}
+                >
+                  {section.ctaLabel}
+                  <ArrowUpRight size={16} />
+                </a>
+              ) : null}
+            </div>
+            <div className="media-strip">
+              {mediaByPlacement(media, section.mediaPlacement).slice(0, 3).map((item) => (
+                <MediaTile item={item} key={item.id} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {galleryMedia.length > 0 ? (
+        <section className="section">
+          <div className="container">
+            <div className="section-header">
+              <div>
+                <h2>Gallery</h2>
+                <p className="section-lede">
+                  Media selected in the admin area and published for visitors.
+                </p>
+              </div>
+            </div>
+            <div className="media-gallery">
+              {galleryMedia.map((item) => (
+                <MediaTile item={item} key={item.id} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="section" id="trade">
         <div className="container">
