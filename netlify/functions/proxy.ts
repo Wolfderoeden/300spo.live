@@ -36,6 +36,8 @@ function responseHeaders(response: Response, request: Request) {
     headers.set("location", location.replace(UPSTREAM_ORIGIN, requestUrl.origin));
   }
 
+  headers.delete("content-encoding");
+  headers.delete("content-length");
   headers.delete("content-security-policy");
   headers.set("x-300spo-proxy", "netlify");
   return headers;
