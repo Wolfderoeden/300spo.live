@@ -41,9 +41,7 @@ function readWallets(): Array<[string, CardanoWallet]> {
 }
 
 export function TradePanel() {
-  const [wallets, setWallets] = useState<Array<[string, CardanoWallet]>>(() =>
-    readWallets(),
-  );
+  const [wallets, setWallets] = useState<Array<[string, CardanoWallet]>>([]);
   const [connectedWallet, setConnectedWallet] = useState<MinswapWallet | null>(
     null,
   );
