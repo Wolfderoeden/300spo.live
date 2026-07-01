@@ -22,7 +22,6 @@ export const DREP_ID =
 export const LEGACY_DREP_ID =
   "drep13v2w4fdzt8mdqsrrlqyysvj64qsnd5j8ey839kxh3ujajsmv6cg";
 
-export const PAYPAL_ADA_URL = "https://www.paypal.com/ncp/payment/UWRNB4PUDLEH4";
+export const CARDANOMIX_URL = "https://cardanomix.com";
 export const MINSWAP_PARTNER_CODE = "300spolive";
 export const FEE_RECEIVER_ADDRESS = "addr1q...cawvhd";
-

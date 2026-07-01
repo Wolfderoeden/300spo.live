@@ -1,6 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { WalletConnectButton } from "@/app/components/WalletConnectButton";
 import { getSitePayload } from "@/app/lib/content";
 
 export const runtime = "edge";
@@ -32,6 +33,7 @@ export default async function ContentPage({ params }: PageProps) {
           <Link href="/#trade">Trade</Link>
           <Link href="/#discover">Discover</Link>
         </div>
+        <WalletConnectButton />
       </nav>
       <article className="container document-panel">
         <Link className="pill-link" href="/">

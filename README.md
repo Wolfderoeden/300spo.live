@@ -8,8 +8,8 @@ Cardano website for the 300 ecosystem at `300spo.live`.
 - 300 SPO live metrics
 - DRep profile with delegated ADA shown from on-chain data
 - ADA/USD ticker
-- Minswap trading widget with CIP-30 wallet connection
-- PayPal ADA purchase link
+- Minswap trading widget with top-bar CIP-30 wallet connection
+- CardanoMix ADA entry link
 - Automatic Cardano news
 - Blog and editable content pages
 - Admin CMS for text, sections, tabs/pages, image uploads, video uploads, and visibility toggles

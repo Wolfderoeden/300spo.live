@@ -14,6 +14,7 @@ import {
 } from "./components/LiveMetrics";
 import { NewsFeed } from "./components/NewsFeed";
 import { TradePanel } from "./components/TradePanel";
+import { WalletConnectButton } from "./components/WalletConnectButton";
 import {
   getSitePayload,
   type DiscoverItem,
@@ -161,6 +162,7 @@ export default async function Home() {
             </a>
           ))}
         </div>
+        <WalletConnectButton />
       </nav>
 
       <section
@@ -378,11 +380,11 @@ export default async function Home() {
           <div className="section-header">
             <div>
               <span className="section-kicker">Action layer</span>
-              <h2>Trade 300 and buy ADA.</h2>
+              <h2>Get ADA, then explore 300.</h2>
               <p className="section-lede">
-                Minswap routes 300 with partner code 300spolive, the ADA price
-                stays visible, and the wallet panel exposes CIP-30 connection
-                for Cardano wallets.
+                CardanoMix is the entry route for ADA. Minswap handles swaps
+                with partner code 300spolive, while wallet connection stays
+                available from the top bar.
               </p>
             </div>
             <Shield aria-hidden />
