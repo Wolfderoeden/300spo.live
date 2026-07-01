@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   formatAda,
-  formatDate,
   formatNumber,
   formatPercent,
   formatUsd,
@@ -98,12 +97,6 @@ export function LiveTicker() {
         <span className="label">300 price</span>
         <strong className="value">{formatUsd(metrics?.token?.priceUsd)}</strong>
       </div>
-      <div className="ticker-row">
-        <span className="label">Chain tip</span>
-        <strong className="value">
-          {formatNumber(metrics?.chain?.blockHeight, { maximumFractionDigits: 0 })}
-        </strong>
-      </div>
     </aside>
   );
 }
@@ -153,24 +146,14 @@ export function MetricsGrid() {
         sub: `Liquidity ${formatUsd(metrics?.token?.liquidityUsd)}`,
       },
       {
-        label: "300 Degens NFTs",
-        value: formatNumber(metrics?.nft?.assetCount),
+        label: "300 NFTs",
+        value: "300",
         sub: `${formatNumber(metrics?.nft?.holderCount)} holders`,
       },
       {
         label: "DRep delegated ADA",
         value: formatAda(metrics?.drep?.votingPower),
         sub: `Status ${metrics?.drep?.status ?? "-"}`,
-      },
-      {
-        label: "DRep expiry epoch",
-        value: formatNumber(metrics?.drep?.expiresEpoch),
-        sub: `Deposit ${formatAda(metrics?.drep?.deposit)}`,
-      },
-      {
-        label: "Latest block time",
-        value: formatDate(metrics?.chain?.blockTime),
-        sub: `Epoch ${formatNumber(metrics?.chain?.epoch)}`,
       },
     ],
     [metrics],
@@ -217,7 +200,7 @@ export function DrepProfileCard() {
       <MetricCard
         label="DRep status"
         value={String(metrics?.drep?.status ?? "-")}
-        sub={`Expires epoch ${formatNumber(metrics?.drep?.expiresEpoch)}`}
+        sub="On-chain governance profile"
       />
     </div>
   );

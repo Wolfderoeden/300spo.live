@@ -12,7 +12,7 @@ export const metadata: Metadata = {
       "A live Cardano hub for the 300 ecosystem, with on-chain metrics, governance context, trading, Discover updates, and Cardano news.",
     url: "https://300spo.live",
     siteName: "300",
-    images: [{ url: "/arctic-hero.png", width: 1200, height: 750 }],
+    images: [{ url: "/carpathian-hero.png", width: 1200, height: 750 }],
   },
   icons: {
     icon: "/favicon.svg",

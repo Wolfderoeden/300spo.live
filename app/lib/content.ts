@@ -164,23 +164,23 @@ const LEGACY_DEFAULT_CONTENT: SiteContent = {
 };
 
 export const DEFAULT_CONTENT: SiteContent = {
-  contentVersion: 3,
+  contentVersion: 4,
   siteTitle: "300",
   hero: {
-    eyebrow: "300 made readable",
+    eyebrow: "300 on Cardano, explained simply",
     title: "300",
     body:
-      "A simple entry point into the 300 ecosystem: understand the token, NFTs, pool, governance, and next steps without needing to already speak crypto.",
-    primaryLabel: "Start exploring",
+      "A clear home for the 300 token, 300 NFTs, 300 SPO, and 300 DRep. See what is live on-chain, learn what it means, and choose your next step without already speaking crypto.",
+    primaryLabel: "Understand 300",
     secondaryLabel: "View pool",
   },
   sections: [
     {
       id: "ecosystem",
       eyebrow: "Token + NFTs",
-      title: "300 Token + 300 Degens",
+      title: "300 Token + 300 NFTs",
       body:
-        "The 300 token and 300 Degens collection sit together as one public identity: easy to inspect, easy to follow, and connected to live Cardano data.",
+        "The 300 token and the 300 NFT collection belong together as one public identity: easy to inspect, easy to follow, and connected to live Cardano data instead of static claims.",
       ctaLabel: "Open collection",
       ctaHref:
         "https://www.wayup.io/collection/585f70537a92ac23c87c913fba12cb8251c07032ba0a44c851fd3cd6",
@@ -193,7 +193,7 @@ export const DEFAULT_CONTENT: SiteContent = {
       eyebrow: "Stake pool",
       title: "300 SPO",
       body:
-        "The 300 stake pool profile turns pool activity, live stake, delegation, and blocks into a quick snapshot that visitors can understand at a glance.",
+        "Delegating to 300 SPO keeps ADA in the holder's wallet while supporting block production. The profile keeps live stake, delegators, and pool activity readable at a glance.",
       ctaLabel: "View pool",
       ctaHref:
         "https://pool.pm/61d0c2697209cc772297ac9ca784bc0bebf321cffbfe8c8c85d8ab7f",
@@ -206,7 +206,7 @@ export const DEFAULT_CONTENT: SiteContent = {
       eyebrow: "Governance",
       title: "300 DRep",
       body:
-        "The DRep profile shows governance status and delegated ADA from on-chain data, so participation is visible without sending visitors through separate explorers.",
+        "The 300 DRep profile shows current governance status and delegated ADA from on-chain data, with a direct path for people who want their voting power represented.",
       ctaLabel: "",
       ctaHref: "",
       mediaPlacement: "drep",
@@ -216,9 +216,9 @@ export const DEFAULT_CONTENT: SiteContent = {
     {
       id: "how-it-works",
       eyebrow: "How it works",
-      title: "One route into the 300 ecosystem",
+      title: "A simple route into the 300 ecosystem",
       body:
-        "Start with the live overview, read Discover for context, connect a wallet only when you need it, and use the trade section when you are ready to get ADA or swap 300.",
+        "Start with the live overview, understand staking in the Earn section, read Discover for context, connect a wallet only when needed, and use Trade when you are ready to get ADA or swap 300.",
       ctaLabel: "Start with Discover",
       ctaHref: "#discover",
       mediaPlacement: "discover",
@@ -233,7 +233,7 @@ export const DEFAULT_CONTENT: SiteContent = {
       navLabel: "About",
       title: "About 300",
       body:
-        "300 connects a token, NFT collection, stake pool, and DRep profile in one public hub. The goal is simple: make important Cardano signals easier to read, verify, and act on.",
+        "300 connects a Cardano token, 300 NFTs, stake pool operation, and DRep governance in one public hub. The goal is simple: make important Cardano signals easier to understand, verify, and act on.",
       visible: true,
       order: 10,
     },
@@ -245,9 +245,9 @@ export const DEFAULT_CONTENT: SiteContent = {
       slug: "300-cardano-hub",
       title: "300 Cardano hub",
       excerpt:
-        "A plain-language home for 300: token, NFTs, SPO metrics, DRep status, swaps, ADA access, and daily Cardano discovery.",
+        "A plain-language home for 300: token, NFTs, staking, governance, swaps, ADA access, and daily Cardano discovery.",
       body:
-        "300spo.live is designed as a practical hub rather than a brochure. Visitors should quickly understand what 300 is, what can be verified live, and which next step fits them: learn, read, connect, trade, or follow the community.",
+        "300spo.live is designed as a practical hub rather than a brochure. Visitors should quickly understand what 300 is, what can be verified live, and which next step fits them: learn, delegate, read, connect, trade, or follow the community.",
       date: "2026-06-25",
       link: "",
       mediaPlacement: "discover",
@@ -261,9 +261,9 @@ export const DEFAULT_CONTENT: SiteContent = {
       slug: "governance-made-readable",
       title: "Governance made readable",
       excerpt:
-        "DRep information should be understandable at a glance: delegated ADA, status, and context in one place.",
+        "Governance should be understandable at a glance: delegated ADA, status, direct delegation, and context in one place.",
       body:
-        "Cardano governance can feel fragmented when the relevant signals live across multiple explorers. The 300 DRep profile brings the key public values into the same interface as the token, NFTs, pool, and community updates.",
+        "Cardano governance can feel fragmented when the relevant signals live across multiple explorers. The 300 DRep profile brings the key public values and a direct delegation path into the same interface as the token, NFTs, pool, and community updates.",
       date: "2026-06-25",
       link: "",
       mediaPlacement: "drep",
@@ -321,6 +321,45 @@ const V2_TEXT = {
     "discover-community-projects": {
       body:
         "Discover can be expanded from the admin area with new projects, blog posts, and news-style updates. Each item can be published, hidden, featured, linked externally, or paired with uploaded media.",
+    },
+  },
+};
+
+const V3_TEXT = {
+  heroEyebrow: "300 made readable",
+  heroBody:
+    "A simple entry point into the 300 ecosystem: understand the token, NFTs, pool, governance, and next steps without needing to already speak crypto.",
+  heroPrimaryLabel: "Start exploring",
+  sections: {
+    ecosystem:
+      "The 300 token and 300 Degens collection sit together as one public identity: easy to inspect, easy to follow, and connected to live Cardano data.",
+    "spo-profile":
+      "The 300 stake pool profile turns pool activity, live stake, delegation, and blocks into a quick snapshot that visitors can understand at a glance.",
+    "drep-profile":
+      "The DRep profile shows governance status and delegated ADA from on-chain data, so participation is visible without sending visitors through separate explorers.",
+    "how-it-works":
+      "Start with the live overview, read Discover for context, connect a wallet only when you need it, and use the trade section when you are ready to get ADA or swap 300.",
+  },
+  about:
+    "300 connects a token, NFT collection, stake pool, and DRep profile in one public hub. The goal is simple: make important Cardano signals easier to read, verify, and act on.",
+  discover: {
+    "discover-300-hub": {
+      excerpt:
+        "A plain-language home for 300: token, NFTs, SPO metrics, DRep status, swaps, ADA access, and daily Cardano discovery.",
+      body:
+        "300spo.live is designed as a practical hub rather than a brochure. Visitors should quickly understand what 300 is, what can be verified live, and which next step fits them: learn, read, connect, trade, or follow the community.",
+    },
+    "discover-governance": {
+      excerpt:
+        "DRep information should be understandable at a glance: delegated ADA, status, and context in one place.",
+      body:
+        "Cardano governance can feel fragmented when the relevant signals live across multiple explorers. The 300 DRep profile brings the key public values into the same interface as the token, NFTs, pool, and community updates.",
+    },
+    "discover-community-projects": {
+      excerpt:
+        "A clean lane for projects, collaborations, releases, and initiatives that should be visible from the front page.",
+      body:
+        "Discover can be expanded from the admin area with projects, articles, and updates. Each item can be published, hidden, featured, linked externally, or paired with uploaded media.",
     },
   },
 };
@@ -436,18 +475,26 @@ function upgradeContent(content: SiteContent): SiteContent {
     hero: {
       eyebrow: replaceKnownText(
         content.hero.eyebrow,
-        [LEGACY_DEFAULT_CONTENT.hero.eyebrow, V2_TEXT.heroEyebrow],
+        [
+          LEGACY_DEFAULT_CONTENT.hero.eyebrow,
+          V2_TEXT.heroEyebrow,
+          V3_TEXT.heroEyebrow,
+        ],
         DEFAULT_CONTENT.hero.eyebrow,
       ),
       title: content.hero.title,
       body: replaceKnownText(
         content.hero.body,
-        [LEGACY_DEFAULT_CONTENT.hero.body, V2_TEXT.heroBody],
+        [LEGACY_DEFAULT_CONTENT.hero.body, V2_TEXT.heroBody, V3_TEXT.heroBody],
         DEFAULT_CONTENT.hero.body,
       ),
       primaryLabel: replaceKnownText(
         content.hero.primaryLabel,
-        [LEGACY_DEFAULT_CONTENT.hero.primaryLabel, V2_TEXT.heroPrimaryLabel],
+        [
+          LEGACY_DEFAULT_CONTENT.hero.primaryLabel,
+          V2_TEXT.heroPrimaryLabel,
+          V3_TEXT.heroPrimaryLabel,
+        ],
         DEFAULT_CONTENT.hero.primaryLabel,
       ),
       secondaryLabel: content.hero.secondaryLabel,
@@ -478,12 +525,23 @@ function upgradeContent(content: SiteContent): SiteContent {
     return {
       ...section,
       eyebrow: replaceKnownText(section.eyebrow, [legacy?.eyebrow], next.eyebrow),
-      title: replaceKnownText(section.title, [legacy?.title], next.title),
+      title: replaceKnownText(
+        section.title,
+        [
+          legacy?.title,
+          section.id === "ecosystem" ? "300 Token + 300 Degens" : undefined,
+          section.id === "how-it-works"
+            ? "One route into the 300 ecosystem"
+            : undefined,
+        ],
+        next.title,
+      ),
       body: replaceKnownText(
         section.body,
         [
           legacy?.body,
           V2_TEXT.sections[section.id as keyof typeof V2_TEXT.sections],
+          V3_TEXT.sections[section.id as keyof typeof V3_TEXT.sections],
         ],
         next.body,
       ),
@@ -517,7 +575,11 @@ function upgradeContent(content: SiteContent): SiteContent {
       ? {
           ...page,
           title: replaceKnownText(page.title, [legacy?.title], next.title),
-          body: replaceKnownText(page.body, [legacy?.body, V2_TEXT.about], next.body),
+          body: replaceKnownText(
+            page.body,
+            [legacy?.body, V2_TEXT.about, V3_TEXT.about],
+            next.body,
+          ),
         }
       : page;
   });
@@ -530,16 +592,23 @@ function upgradeContent(content: SiteContent): SiteContent {
     const previous = V2_TEXT.discover[
       item.id as keyof typeof V2_TEXT.discover
     ] as { excerpt?: string; body?: string } | undefined;
+    const previousV3 = V3_TEXT.discover[
+      item.id as keyof typeof V3_TEXT.discover
+    ] as { excerpt?: string; body?: string } | undefined;
 
     return next
       ? {
           ...item,
           excerpt: replaceKnownText(
             item.excerpt,
-            [previous?.excerpt],
+            [previous?.excerpt, previousV3?.excerpt],
             next.excerpt,
           ),
-          body: replaceKnownText(item.body, [previous?.body], next.body),
+          body: replaceKnownText(
+            item.body,
+            [previous?.body, previousV3?.body],
+            next.body,
+          ),
         }
       : item;
   });

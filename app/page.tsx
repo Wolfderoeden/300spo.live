@@ -13,6 +13,7 @@ import {
   MetricsGrid,
 } from "./components/LiveMetrics";
 import { NewsFeed } from "./components/NewsFeed";
+import { StakeRewardFlow } from "./components/StakeRewardFlow";
 import { TradePanel } from "./components/TradePanel";
 import { WalletConnectButton } from "./components/WalletConnectButton";
 import {
@@ -21,10 +22,13 @@ import {
   type MediaItem,
 } from "./lib/content";
 import {
+  DREP_DELEGATE_URL,
   DREP_ID,
+  GOVTOOLS_DREP_URL,
   LEGACY_DREP_ID,
   NFT_COLLECTION_URL,
   POOL_PM_URL,
+  SPO_DELEGATE_URL,
   TOKEN_ID,
 } from "./lib/constants";
 
@@ -151,9 +155,8 @@ export default async function Home() {
           <span>{content.siteTitle}</span>
         </a>
         <div className="nav-links">
-          <a href="#metrics">Metrics</a>
-          <a href="#ecosystem">Ecosystem</a>
-          <a href="#governance">SPO + DRep</a>
+          <a href="#metrics">Live</a>
+          <a href="#earn">Earn</a>
           <a href="#trade">Trade</a>
           <a href="#discover">Discover</a>
           {pages.map((page) => (
@@ -208,16 +211,33 @@ export default async function Home() {
           <div className="section-header">
             <div>
               <span className="section-kicker">Live on-chain surface</span>
-              <h2>Signals visitors can verify.</h2>
+              <h2>Numbers that make 300 readable.</h2>
               <p className="section-lede">
-                Pool, token, NFT, chain, and DRep values are read from Cardano
-                data sources. If a value cannot be fetched, the site shows a
-                dash.
+                Pool, token, NFT, and DRep values are read from Cardano data
+                sources. If a value cannot be fetched, the site shows a dash.
               </p>
             </div>
             <Snowflake aria-hidden />
           </div>
           <MetricsGrid />
+        </div>
+      </section>
+
+      <section className="section reward-section" id="earn">
+        <div className="container">
+          <div className="section-header">
+            <div>
+              <span className="section-kicker">Earn</span>
+              <h2>Understand staking before you click anything.</h2>
+              <p className="section-lede">
+                A simple moving model for visitors who are new to Cardano:
+                delegation is a choice, your ADA stays in your wallet, and
+                rewards follow protocol rules instead of promises.
+              </p>
+            </div>
+            <Landmark aria-hidden />
+          </div>
+          <StakeRewardFlow />
         </div>
       </section>
 
@@ -237,11 +257,11 @@ export default async function Home() {
             <div className="accent-bar" />
             <span className="label">Ecosystem</span>
             <h2 className="mt-3">
-              {ecosystemSection?.title ?? "300 Token + 300 Degens"}
+              {ecosystemSection?.title ?? "300 Token + 300 NFTs"}
             </h2>
             <p className="copy-block mt-4">
               {ecosystemSection?.body ??
-                "The token and NFT collection are shown together as the public 300 identity, with SPO and DRep data connected beside them."}
+                "The 300 token and 300 NFT collection are shown together as one public identity, with SPO and DRep data connected beside them."}
             </p>
             <div className="id-stack">
               <span className="id-chip">Token ID: {TOKEN_ID}</span>
@@ -286,12 +306,11 @@ export default async function Home() {
         <div className="container">
           <div className="section-header">
             <div>
-              <span className="section-kicker">Operate + govern</span>
-              <h2>SPO and DRep in one view.</h2>
+              <span className="section-kicker">Participate</span>
+              <h2>Stake, govern, and verify from one place.</h2>
               <p className="section-lede">
-                The operational and governance profiles are separated enough to
-                scan quickly, but close enough that visitors understand the
-                full 300 Cardano footprint.
+                The stake pool and governance profile are easy to scan, with
+                direct action buttons for delegation and clear on-chain context.
               </p>
             </div>
             <Landmark aria-hidden />
@@ -307,23 +326,29 @@ export default async function Home() {
                   {spoSection?.body ??
                     "Pool activity, live stake, delegation, blocks, and Cardano network participation in one readable profile."}
                 </p>
-                {spoSection?.ctaHref && spoSection.ctaLabel ? (
-                  <a
-                    className="pill-link"
-                    href={spoSection.ctaHref}
-                    target={
-                      spoSection.ctaHref.startsWith("http") ? "_blank" : undefined
-                    }
-                    rel={
-                      spoSection.ctaHref.startsWith("http")
-                        ? "noreferrer"
-                        : undefined
-                    }
-                  >
-                    {spoSection.ctaLabel}
+                <div className="inline-actions">
+                  <a className="pill-link primary-action" href={SPO_DELEGATE_URL}>
+                    Delegate to 300 SPO
                     <ArrowUpRight size={16} />
                   </a>
-                ) : null}
+                  {spoSection?.ctaHref && spoSection.ctaLabel ? (
+                    <a
+                      className="pill-link"
+                      href={spoSection.ctaHref}
+                      target={
+                        spoSection.ctaHref.startsWith("http") ? "_blank" : undefined
+                      }
+                      rel={
+                        spoSection.ctaHref.startsWith("http")
+                          ? "noreferrer"
+                          : undefined
+                      }
+                    >
+                      {spoSection.ctaLabel}
+                      <ArrowUpRight size={16} />
+                    </a>
+                  ) : null}
+                </div>
               </div>
             </article>
 
@@ -338,6 +363,21 @@ export default async function Home() {
                     "Current delegated ADA and DRep status are shown from on-chain data."}
                 </p>
                 <DrepProfileCard />
+                <div className="inline-actions">
+                  <a className="pill-link primary-action" href={DREP_DELEGATE_URL}>
+                    Delegate to 300 DRep
+                    <ArrowUpRight size={16} />
+                  </a>
+                  <a
+                    className="pill-link"
+                    href={GOVTOOLS_DREP_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View on GovTool
+                    <ArrowUpRight size={16} />
+                  </a>
+                </div>
               </div>
             </article>
           </div>

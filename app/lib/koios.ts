@@ -9,6 +9,7 @@ import {
 
 const KOIOS_BASE = "https://api.koios.rest/api/v1";
 const MINSWAP_BASE = "https://api-mainnet-prod.minswap.org";
+const NFT_COLLECTION_SIZE = 300;
 
 type JsonRecord = Record<string, unknown>;
 
@@ -139,13 +140,8 @@ export async function getMetrics() {
     },
     nft: {
       policyId: NFT_POLICY_ID,
-      assetCount: Array.isArray(nftAssets) ? nftAssets.length : null,
-      supply: Array.isArray(nftAssets)
-        ? nftAssets.reduce((sum, asset) => {
-            const quantity = Number(asset.total_supply ?? 0);
-            return Number.isFinite(quantity) ? sum + quantity : sum;
-          }, 0)
-        : null,
+      assetCount: Array.isArray(nftAssets) ? NFT_COLLECTION_SIZE : null,
+      supply: Array.isArray(nftAssets) ? NFT_COLLECTION_SIZE : null,
       holderCount: Array.isArray(nftAddresses)
         ? countUnique(
             nftAddresses.map((row) =>
@@ -165,4 +161,3 @@ export async function getMetrics() {
     },
   };
 }
-

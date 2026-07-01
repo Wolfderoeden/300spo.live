@@ -27,9 +27,8 @@ export default async function ContentPage({ params }: PageProps) {
           <span>{content.siteTitle}</span>
         </Link>
         <div className="nav-links">
-          <Link href="/#metrics">Metrics</Link>
-          <Link href="/#ecosystem">Ecosystem</Link>
-          <Link href="/#governance">SPO + DRep</Link>
+          <Link href="/#metrics">Live</Link>
+          <Link href="/#earn">Earn</Link>
           <Link href="/#trade">Trade</Link>
           <Link href="/#discover">Discover</Link>
         </div>
