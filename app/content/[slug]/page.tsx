@@ -27,10 +27,10 @@ export default async function ContentPage({ params }: PageProps) {
         </Link>
         <div className="nav-links">
           <Link href="/#metrics">Metrics</Link>
+          <Link href="/#ecosystem">Ecosystem</Link>
+          <Link href="/#governance">SPO + DRep</Link>
           <Link href="/#trade">Trade</Link>
-          <Link href="/#news">News</Link>
-          <Link href="/#blog">Blog</Link>
-          <Link href="/admin">Admin</Link>
+          <Link href="/#discover">Discover</Link>
         </div>
       </nav>
       <article className="container document-panel">

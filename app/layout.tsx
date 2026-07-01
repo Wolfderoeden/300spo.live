@@ -4,12 +4,12 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "300",
   description:
-    "The 300 Cardano hub for the 300 token, 300 Degens NFTs, SPO metrics, DRep status, swaps, ADA buys, and Cardano news.",
+    "The 300 Cardano hub for token data, 300 Degens, SPO metrics, DRep governance, swaps, ADA access, Discover updates, and Cardano news.",
   metadataBase: new URL("https://300spo.live"),
   openGraph: {
     title: "300",
     description:
-      "A live Cardano hub for the 300 ecosystem, with on-chain metrics and Cardano news.",
+      "A live Cardano hub for the 300 ecosystem, with on-chain metrics, governance context, trading, Discover updates, and Cardano news.",
     url: "https://300spo.live",
     siteName: "300",
     images: [{ url: "/arctic-hero.png", width: 1200, height: 750 }],

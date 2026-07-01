@@ -23,7 +23,7 @@ async function getNews() {
   }
 }
 
-export function NewsFeed() {
+export function NewsFeed({ limit = 3 }: { limit?: number }) {
   const [items, setItems] = useState<NewsItem[] | null>(null);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export function NewsFeed() {
 
   return (
     <div className="grid three-grid">
-      {items.slice(0, 3).map((item, index) => (
+      {items.slice(0, limit).map((item, index) => (
         <article className="news-card" key={`${item.link ?? item.title}-${index}`}>
           <time>{formatDate(item.date)}</time>
           <h3>{item.title ?? "-"}</h3>
@@ -65,4 +65,3 @@ export function NewsFeed() {
     </div>
   );
 }
-

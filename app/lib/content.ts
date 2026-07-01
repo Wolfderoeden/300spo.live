@@ -60,7 +60,25 @@ export type ContentPage = {
   order: number;
 };
 
+export type DiscoverType = "project" | "blog" | "news";
+
+export type DiscoverItem = {
+  id: string;
+  type: DiscoverType;
+  slug: string;
+  title: string;
+  excerpt: string;
+  body: string;
+  date: string;
+  link: string;
+  mediaPlacement: string;
+  visible: boolean;
+  featured: boolean;
+  order: number;
+};
+
 export type SiteContent = {
+  contentVersion: number;
   siteTitle: string;
   hero: {
     eyebrow: string;
@@ -71,6 +89,7 @@ export type SiteContent = {
   };
   sections: ContentSection[];
   pages: ContentPage[];
+  discoverItems: DiscoverItem[];
 };
 
 export type MediaItem = {
@@ -91,7 +110,8 @@ type MediaRow = Omit<MediaItem, "isVisible" | "url"> & {
   isVisible: number | boolean;
 };
 
-export const DEFAULT_CONTENT: SiteContent = {
+const LEGACY_DEFAULT_CONTENT: SiteContent = {
+  contentVersion: 1,
   siteTitle: "300",
   hero: {
     eyebrow: "Cardano hub for 300",
@@ -140,6 +160,134 @@ export const DEFAULT_CONTENT: SiteContent = {
       order: 10,
     },
   ],
+  discoverItems: [],
+};
+
+export const DEFAULT_CONTENT: SiteContent = {
+  contentVersion: 2,
+  siteTitle: "300",
+  hero: {
+    eyebrow: "300 on Cardano",
+    title: "300",
+    body:
+      "A focused Cardano home for the 300 token, 300 Degens, stake pool, and DRep profile: live on-chain data, simple trading, governance context, and daily discovery in one clean place.",
+    primaryLabel: "Discover 300",
+    secondaryLabel: "View pool",
+  },
+  sections: [
+    {
+      id: "ecosystem",
+      eyebrow: "Token + NFTs",
+      title: "300 Token + 300 Degens",
+      body:
+        "The 300 token and 300 Degens collection are presented as one ecosystem: a recognizable Cardano identity for holders, collectors, traders, and community members who want live data instead of static promises.",
+      ctaLabel: "Open collection",
+      ctaHref:
+        "https://www.wayup.io/collection/585f70537a92ac23c87c913fba12cb8251c07032ba0a44c851fd3cd6",
+      mediaPlacement: "ecosystem",
+      visible: true,
+      order: 10,
+    },
+    {
+      id: "spo-profile",
+      eyebrow: "Stake pool",
+      title: "300 SPO",
+      body:
+        "The 300 stake pool profile gives visitors a direct view into pool activity, live stake, delegation, blocks, and Cardano network participation. It keeps the operational side of 300 visible and easy to understand.",
+      ctaLabel: "View pool",
+      ctaHref:
+        "https://pool.pm/61d0c2697209cc772297ac9ca784bc0bebf321cffbfe8c8c85d8ab7f",
+      mediaPlacement: "spo",
+      visible: true,
+      order: 20,
+    },
+    {
+      id: "drep-profile",
+      eyebrow: "Governance",
+      title: "300 DRep",
+      body:
+        "The DRep profile shows current delegated ADA and status from on-chain data, so governance participation is visible without asking visitors to search through separate explorers.",
+      ctaLabel: "",
+      ctaHref: "",
+      mediaPlacement: "drep",
+      visible: true,
+      order: 30,
+    },
+    {
+      id: "how-it-works",
+      eyebrow: "How it works",
+      title: "One route into the 300 ecosystem",
+      body:
+        "Explore the live metrics, connect a Cardano wallet, trade the 300 token through Minswap, follow daily Cardano updates, and return to Discover for projects, blog posts, and governance notes.",
+      ctaLabel: "Start with Discover",
+      ctaHref: "#discover",
+      mediaPlacement: "discover",
+      visible: true,
+      order: 40,
+    },
+  ],
+  pages: [
+    {
+      id: "about-300",
+      slug: "about",
+      navLabel: "About",
+      title: "About 300",
+      body:
+        "300 connects token utility, NFT culture, stake pool operation, and Cardano governance in one public hub. The goal is simple: make the important signals easy to read, easy to verify, and easy to act on.",
+      visible: true,
+      order: 10,
+    },
+  ],
+  discoverItems: [
+    {
+      id: "discover-300-hub",
+      type: "project",
+      slug: "300-cardano-hub",
+      title: "300 Cardano hub",
+      excerpt:
+        "The public home for 300: token, NFTs, SPO metrics, DRep status, swaps, ADA access, and daily Cardano discovery.",
+      body:
+        "300spo.live is designed as a practical hub rather than a brochure. Visitors should immediately understand what 300 is, what live data is available, and which action makes sense next: discover, trade, delegate, read, or contact the community.",
+      date: "2026-06-25",
+      link: "",
+      mediaPlacement: "discover",
+      visible: true,
+      featured: true,
+      order: 10,
+    },
+    {
+      id: "discover-governance",
+      type: "blog",
+      slug: "governance-made-readable",
+      title: "Governance made readable",
+      excerpt:
+        "DRep information should be understandable at a glance: delegated ADA, status, IDs, and context in one place.",
+      body:
+        "Cardano governance can feel fragmented when the relevant signals live across multiple explorers. The 300 DRep profile brings the key public values into the same interface as the token, NFTs, pool, and community updates.",
+      date: "2026-06-25",
+      link: "",
+      mediaPlacement: "drep",
+      visible: true,
+      featured: true,
+      order: 20,
+    },
+    {
+      id: "discover-community-projects",
+      type: "project",
+      slug: "community-projects",
+      title: "Community projects",
+      excerpt:
+        "A clean lane for projects, collaborations, releases, and initiatives that should be visible from the front page.",
+      body:
+        "Discover can be expanded from the admin area with new projects, blog posts, and news-style updates. Each item can be published, hidden, featured, linked externally, or paired with uploaded media.",
+      date: "2026-06-25",
+      link: "",
+      mediaPlacement: "gallery",
+      visible: true,
+      featured: false,
+      order: 30,
+    },
+  ],
 };
 
 let schemaReady = false;
@@ -170,6 +318,12 @@ function asBoolean(value: unknown, fallback = true) {
 
 function asNumber(value: unknown, fallback = 0) {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function asDiscoverType(value: unknown): DiscoverType {
+  return value === "blog" || value === "news" || value === "project"
+    ? value
+    : "project";
 }
 
 function slugify(value: string) {
@@ -209,10 +363,131 @@ function normalizePage(page: Partial<ContentPage>, index: number) {
   };
 }
 
+function normalizeDiscoverItem(item: Partial<DiscoverItem>, index: number) {
+  const title = asString(item.title, "New item");
+
+  return {
+    id: asString(item.id) || crypto.randomUUID(),
+    type: asDiscoverType(item.type),
+    slug: slugify(asString(item.slug) || title),
+    title,
+    excerpt: asString(item.excerpt),
+    body: asString(item.body),
+    date: asString(item.date),
+    link: asString(item.link),
+    mediaPlacement: asString(item.mediaPlacement, "discover"),
+    visible: asBoolean(item.visible, true),
+    featured: asBoolean(item.featured, false),
+    order: asNumber(item.order, (index + 1) * 10),
+  };
+}
+
+function replaceLegacyText(
+  current: string,
+  legacy: string | undefined,
+  next: string,
+) {
+  return current === legacy ? next : current;
+}
+
+function upgradeContent(content: SiteContent): SiteContent {
+  if (content.contentVersion >= DEFAULT_CONTENT.contentVersion) {
+    return content;
+  }
+
+  const upgraded: SiteContent = {
+    ...content,
+    contentVersion: DEFAULT_CONTENT.contentVersion,
+    hero: {
+      eyebrow: replaceLegacyText(
+        content.hero.eyebrow,
+        LEGACY_DEFAULT_CONTENT.hero.eyebrow,
+        DEFAULT_CONTENT.hero.eyebrow,
+      ),
+      title: content.hero.title,
+      body: replaceLegacyText(
+        content.hero.body,
+        LEGACY_DEFAULT_CONTENT.hero.body,
+        DEFAULT_CONTENT.hero.body,
+      ),
+      primaryLabel: replaceLegacyText(
+        content.hero.primaryLabel,
+        LEGACY_DEFAULT_CONTENT.hero.primaryLabel,
+        DEFAULT_CONTENT.hero.primaryLabel,
+      ),
+      secondaryLabel: content.hero.secondaryLabel,
+    },
+    sections: [...content.sections],
+    pages: [...content.pages],
+    discoverItems:
+      content.discoverItems.length > 0
+        ? content.discoverItems
+        : DEFAULT_CONTENT.discoverItems,
+  };
+
+  const legacySections = new Map(
+    LEGACY_DEFAULT_CONTENT.sections.map((section) => [section.id, section]),
+  );
+  const defaultSections = new Map(
+    DEFAULT_CONTENT.sections.map((section) => [section.id, section]),
+  );
+
+  upgraded.sections = upgraded.sections.map((section) => {
+    const legacy = legacySections.get(section.id);
+    const next = defaultSections.get(section.id);
+
+    if (!next) {
+      return section;
+    }
+
+    return {
+      ...section,
+      eyebrow: replaceLegacyText(section.eyebrow, legacy?.eyebrow, next.eyebrow),
+      title: replaceLegacyText(section.title, legacy?.title, next.title),
+      body: replaceLegacyText(section.body, legacy?.body, next.body),
+      ctaLabel: replaceLegacyText(
+        section.ctaLabel,
+        legacy?.ctaLabel,
+        next.ctaLabel,
+      ),
+      ctaHref: replaceLegacyText(section.ctaHref, legacy?.ctaHref, next.ctaHref),
+      mediaPlacement: section.mediaPlacement || next.mediaPlacement,
+      order: section.order || next.order,
+    };
+  });
+
+  const existingSectionIds = new Set(upgraded.sections.map((section) => section.id));
+  for (const section of DEFAULT_CONTENT.sections) {
+    if (!existingSectionIds.has(section.id)) {
+      upgraded.sections.push(section);
+    }
+  }
+
+  const legacyPages = new Map(
+    LEGACY_DEFAULT_CONTENT.pages.map((page) => [page.id, page]),
+  );
+  const defaultPages = new Map(DEFAULT_CONTENT.pages.map((page) => [page.id, page]));
+  upgraded.pages = upgraded.pages.map((page) => {
+    const legacy = legacyPages.get(page.id);
+    const next = defaultPages.get(page.id);
+
+    return next
+      ? {
+          ...page,
+          title: replaceLegacyText(page.title, legacy?.title, next.title),
+          body: replaceLegacyText(page.body, legacy?.body, next.body),
+        }
+      : page;
+  });
+
+  return upgraded;
+}
+
 export function normalizeContent(value: Partial<SiteContent>): SiteContent {
   const hero = value.hero ?? {};
 
   return {
+    contentVersion: asNumber(value.contentVersion, 1),
     siteTitle: asString(value.siteTitle, DEFAULT_CONTENT.siteTitle),
     hero: {
       eyebrow: asString(hero.eyebrow, DEFAULT_CONTENT.hero.eyebrow),
@@ -230,6 +505,9 @@ export function normalizeContent(value: Partial<SiteContent>): SiteContent {
     pages: Array.isArray(value.pages)
       ? value.pages.map(normalizePage)
       : DEFAULT_CONTENT.pages,
+    discoverItems: Array.isArray(value.discoverItems)
+      ? value.discoverItems.map(normalizeDiscoverItem)
+      : DEFAULT_CONTENT.discoverItems,
   };
 }
 
@@ -274,7 +552,21 @@ async function seedContent(db: D1DatabaseLike) {
     .first<{ value: string }>();
 
   if (row?.value) {
-    return normalizeContent(JSON.parse(row.value) as Partial<SiteContent>);
+    const normalized = normalizeContent(JSON.parse(row.value) as Partial<SiteContent>);
+    const upgraded = upgradeContent(normalized);
+
+    if (JSON.stringify(upgraded) !== JSON.stringify(normalized)) {
+      await db
+        .prepare(
+          `UPDATE content_entries
+           SET value = ?, updated_at = ?
+           WHERE key = ?`,
+        )
+        .bind(JSON.stringify(upgraded), nowIso(), CONTENT_KEY)
+        .run();
+    }
+
+    return upgraded;
   }
 
   const timestamp = nowIso();
@@ -347,7 +639,7 @@ export async function saveSiteContent(content: SiteContent) {
   }
 
   await ensureSchema(db);
-  const normalized = normalizeContent(content);
+  const normalized = upgradeContent(normalizeContent(content));
   await db
     .prepare(
       `INSERT INTO content_entries (key, value, updated_at)

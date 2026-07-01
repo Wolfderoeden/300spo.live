@@ -1,7 +1,15 @@
 "use client";
 
-import type { ContentPage, ContentSection, MediaItem, SiteContent } from "@/app/lib/content";
+import type {
+  ContentPage,
+  ContentSection,
+  DiscoverItem,
+  DiscoverType,
+  MediaItem,
+  SiteContent,
+} from "@/app/lib/content";
 import {
+  Compass,
   Eye,
   EyeOff,
   FileText,
@@ -30,6 +38,22 @@ const emptySession: SessionState = {
   configured: true,
 };
 
+const mediaPlacementOptions = [
+  { value: "hero", label: "Hero" },
+  { value: "ecosystem", label: "Token + NFT" },
+  { value: "spo", label: "SPO" },
+  { value: "drep", label: "DRep" },
+  { value: "discover", label: "Discover" },
+  { value: "gallery", label: "Gallery" },
+  { value: "library", label: "Library only" },
+];
+
+const discoverTypeLabels: Record<DiscoverType, string> = {
+  project: "Project",
+  blog: "Blog",
+  news: "News",
+};
+
 function makeSection(order: number): ContentSection {
   return {
     id: crypto.randomUUID(),
@@ -56,6 +80,35 @@ function makePage(order: number): ContentPage {
   };
 }
 
+function slugify(value: string) {
+  return (
+    value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || `item-${crypto.randomUUID().slice(0, 8)}`
+  );
+}
+
+function makeDiscoverItem(order: number, type: DiscoverType): DiscoverItem {
+  const title = `New ${discoverTypeLabels[type].toLowerCase()}`;
+
+  return {
+    id: crypto.randomUUID(),
+    type,
+    slug: slugify(title),
+    title,
+    excerpt: "",
+    body: "",
+    date: new Date().toISOString().slice(0, 10),
+    link: "",
+    mediaPlacement: type === "project" ? "discover" : "gallery",
+    visible: true,
+    featured: type === "project",
+    order,
+  };
+}
+
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);
   const payload = (await response.json().catch(() => ({}))) as T & {
@@ -67,6 +120,24 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   }
 
   return payload;
+}
+
+function MediaPlacementSelect({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <select value={value} onChange={(event) => onChange(event.target.value)}>
+      {mediaPlacementOptions.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  );
 }
 
 function Field({
@@ -112,9 +183,9 @@ export function AdminPanel() {
   const [content, setContent] = useState<SiteContent | null>(null);
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [storageReady, setStorageReady] = useState(false);
-  const [activeTab, setActiveTab] = useState<"content" | "pages" | "media">(
-    "content",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "content" | "discover" | "pages" | "media"
+  >("content");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -125,6 +196,11 @@ export function AdminPanel() {
   const sortedPages = useMemo(
     () => [...(content?.pages ?? [])].sort((a, b) => a.order - b.order),
     [content?.pages],
+  );
+  const sortedDiscoverItems = useMemo(
+    () =>
+      [...(content?.discoverItems ?? [])].sort((a, b) => a.order - b.order),
+    [content?.discoverItems],
   );
 
   async function loadAdminPayload() {
@@ -295,6 +371,19 @@ export function AdminPanel() {
     );
   }
 
+  function patchDiscoverItem(id: string, next: Partial<DiscoverItem>) {
+    setContent((current) =>
+      current
+        ? {
+            ...current,
+            discoverItems: current.discoverItems.map((item) =>
+              item.id === id ? { ...item, ...next } : item,
+            ),
+          }
+        : current,
+    );
+  }
+
   if (!session.configured) {
     return (
       <main className="admin-shell">
@@ -370,6 +459,14 @@ export function AdminPanel() {
           >
             <FileText size={16} />
             Content
+          </button>
+          <button
+            className={activeTab === "discover" ? "is-active" : ""}
+            onClick={() => setActiveTab("discover")}
+            type="button"
+          >
+            <Compass size={16} />
+            Discover
           </button>
           <button
             className={activeTab === "pages" ? "is-active" : ""}
@@ -513,11 +610,11 @@ export function AdminPanel() {
                           />
                         </Field>
                         <Field label="Media placement">
-                          <input
+                          <MediaPlacementSelect
                             value={section.mediaPlacement}
-                            onChange={(event) =>
+                            onChange={(value) =>
                               patchSection(section.id, {
-                                mediaPlacement: event.target.value,
+                                mediaPlacement: value,
                               })
                             }
                           />
@@ -548,6 +645,152 @@ export function AdminPanel() {
                 </div>
               </section>
             </>
+          ) : null}
+
+          {activeTab === "discover" ? (
+            <section className="admin-card">
+              <div className="admin-card-header">
+                <div>
+                  <span className="label">Discover</span>
+                  <h2>Projects, blog, and news</h2>
+                </div>
+                <div className="admin-actions compact-actions">
+                  {(["project", "blog", "news"] as DiscoverType[]).map((type) => (
+                    <button
+                      className="admin-ghost"
+                      key={type}
+                      onClick={() =>
+                        patchContent({
+                          discoverItems: [
+                            ...content.discoverItems,
+                            makeDiscoverItem(
+                              (content.discoverItems.length + 1) * 10,
+                              type,
+                            ),
+                          ],
+                        })
+                      }
+                      type="button"
+                    >
+                      <Plus size={16} />
+                      {discoverTypeLabels[type]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="stack">
+                {sortedDiscoverItems.map((item) => (
+                  <article className="editor-block" key={item.id}>
+                    <div className="editor-block-head">
+                      <div>
+                        <span className="label">
+                          {discoverTypeLabels[item.type]}
+                        </span>
+                        <strong>{item.title}</strong>
+                      </div>
+                      <div className="admin-actions compact-actions">
+                        <Toggle
+                          checked={item.featured}
+                          label={item.featured ? "Featured" : "Normal"}
+                          onChange={(checked) =>
+                            patchDiscoverItem(item.id, { featured: checked })
+                          }
+                        />
+                        <Toggle
+                          checked={item.visible}
+                          label={item.visible ? "Shown" : "Hidden"}
+                          onChange={(checked) =>
+                            patchDiscoverItem(item.id, { visible: checked })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="admin-form-grid">
+                      <Field label="Type">
+                        <select
+                          value={item.type}
+                          onChange={(event) =>
+                            patchDiscoverItem(item.id, {
+                              type: event.target.value as DiscoverType,
+                            })
+                          }
+                        >
+                          <option value="project">Project</option>
+                          <option value="blog">Blog</option>
+                          <option value="news">News</option>
+                        </select>
+                      </Field>
+                      <Field label="Date">
+                        <input
+                          value={item.date}
+                          onChange={(event) =>
+                            patchDiscoverItem(item.id, {
+                              date: event.target.value,
+                            })
+                          }
+                        />
+                      </Field>
+                      <Field label="Title">
+                        <input
+                          value={item.title}
+                          onChange={(event) =>
+                            patchDiscoverItem(item.id, {
+                              title: event.target.value,
+                            })
+                          }
+                        />
+                      </Field>
+                      <Field label="Slug">
+                        <input
+                          value={item.slug}
+                          onChange={(event) =>
+                            patchDiscoverItem(item.id, {
+                              slug: slugify(event.target.value),
+                            })
+                          }
+                        />
+                      </Field>
+                      <Field label="Short text">
+                        <textarea
+                          value={item.excerpt}
+                          onChange={(event) =>
+                            patchDiscoverItem(item.id, {
+                              excerpt: event.target.value,
+                            })
+                          }
+                        />
+                      </Field>
+                      <Field label="Full article">
+                        <textarea
+                          value={item.body}
+                          onChange={(event) =>
+                            patchDiscoverItem(item.id, { body: event.target.value })
+                          }
+                        />
+                      </Field>
+                      <Field label="External URL">
+                        <input
+                          value={item.link}
+                          onChange={(event) =>
+                            patchDiscoverItem(item.id, { link: event.target.value })
+                          }
+                        />
+                      </Field>
+                      <Field label="Media placement">
+                        <MediaPlacementSelect
+                          value={item.mediaPlacement}
+                          onChange={(value) =>
+                            patchDiscoverItem(item.id, {
+                              mediaPlacement: value,
+                            })
+                          }
+                        />
+                      </Field>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
           ) : null}
 
           {activeTab === "pages" ? (
@@ -646,11 +889,11 @@ export function AdminPanel() {
                 </Field>
                 <Field label="Placement">
                   <select name="placement" defaultValue="gallery">
-                    <option value="hero">Hero</option>
-                    <option value="ecosystem">Token + NFT</option>
-                    <option value="drep">DRep</option>
-                    <option value="gallery">Gallery</option>
-                    <option value="library">Library only</option>
+                    {mediaPlacementOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
                   </select>
                 </Field>
                 <input name="isVisible" type="hidden" value="true" />
@@ -678,18 +921,12 @@ export function AdminPanel() {
                       />
                     </Field>
                     <Field label="Placement">
-                      <select
+                      <MediaPlacementSelect
                         value={item.placement}
-                        onChange={(event) =>
-                          updateMedia(item.id, { placement: event.target.value })
+                        onChange={(value) =>
+                          updateMedia(item.id, { placement: value })
                         }
-                      >
-                        <option value="hero">Hero</option>
-                        <option value="ecosystem">Token + NFT</option>
-                        <option value="drep">DRep</option>
-                        <option value="gallery">Gallery</option>
-                        <option value="library">Library only</option>
-                      </select>
+                      />
                     </Field>
                     <Toggle
                       checked={item.isVisible}
