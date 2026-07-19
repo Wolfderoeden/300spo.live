@@ -1,0 +1,6 @@
+# Local Netlify folder
+.netlify
+node_modules/
+public/wallet-app/
+public/downloads/*.apk
+public/downloads/*.zip
