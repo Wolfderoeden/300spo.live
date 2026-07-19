@@ -93,6 +93,7 @@ jobs:
           pnpm export:web
           node extension/package-extension.mjs extension/build/ci-preprod-preview
           cd extension/build/ci-preprod-preview
+          mkdir -p ../../../../site/site-live/public/downloads
           zip -qr ../../../../site/site-live/public/downloads/300-wallet-chrome-preprod-preview.zip .
 
       - name: Revalidate complete preview package
