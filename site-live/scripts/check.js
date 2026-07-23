@@ -44,6 +44,8 @@ const requiredWalletMarkers = [
   "Preprod-Testversion",
   "data-wallet-preview-status",
   "data-wallet-frame",
+  "data-android-link hidden",
+  "data-android-card hidden",
   "/wallet-app/index.html",
 ];
 const missingMarkers = requiredWalletMarkers.filter((marker) => !walletPage.includes(marker));

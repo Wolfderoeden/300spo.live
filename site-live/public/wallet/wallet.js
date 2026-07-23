@@ -3,6 +3,8 @@ const previewFrame = document.querySelector("[data-wallet-frame]");
 const previewOpenLinks = [...document.querySelectorAll("[data-wallet-open]")];
 const apkDownload = document.querySelector("[data-apk-download]");
 const apkStatus = document.querySelector("[data-apk-status]");
+const androidLink = document.querySelector("[data-android-link]");
+const androidCard = document.querySelector("[data-android-card]");
 
 const showIntegratedWallet = () => {
   previewFrame.src = "/wallet-app/index.html";
@@ -52,9 +54,13 @@ const detectAndroidBuild = async () => {
 
     apkDownload.hidden = false;
     apkStatus.textContent = "Preprod-Testversion";
+    if (androidLink) androidLink.hidden = false;
+    if (androidCard) androidCard.hidden = false;
   } catch {
     apkDownload.hidden = true;
     apkStatus.textContent = "Preprod-Testversion · APK wird bereitgestellt";
+    if (androidLink) androidLink.hidden = true;
+    if (androidCard) androidCard.hidden = true;
   }
 };
 
