@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { join, relative, sep } from "node:path";
 
 const required = [
   "public/index.html",
@@ -52,6 +53,26 @@ if (missingMarkers.length) {
   process.exit(1);
 }
 
+const homePage = readFileSync("public/index.html", "utf8");
+const missingHomeMarkers = [
+  'class="wallet-nav-link" href="/wallet/"',
+  'class="wallet-promo"',
+  'href="/wallet/">300 Wallet öffnen',
+].filter((marker) => !homePage.includes(marker));
+if (missingHomeMarkers.length) {
+  console.error(`Homepage is missing visible wallet entry points:\n${missingHomeMarkers.join("\n")}`);
+  process.exit(1);
+}
+
+const netlifyConfiguration = readFileSync("netlify.toml", "utf8");
+if (
+  !netlifyConfiguration.includes('for = "/wallet-app/assets/cardano/*"') ||
+  !netlifyConfiguration.includes('Content-Type = "application/wasm"')
+) {
+  console.error("Netlify configuration must serve the stable Cardano WASM path as application/wasm");
+  process.exit(1);
+}
+
 const walletManifest = JSON.parse(readFileSync("public/wallet/manifest.webmanifest", "utf8"));
 if (walletManifest.start_url !== "/wallet/" || walletManifest.scope !== "/wallet/" || walletManifest.display !== "standalone") {
   console.error("Wallet web app manifest must use /wallet/ for start_url and scope with standalone display");
@@ -74,6 +95,11 @@ for (const script of ["public/wallet/wallet.js", "scripts/integrate-wallet-web.m
   execFileSync(process.execPath, ["--check", script], { stdio: "inherit" });
 }
 
+const walkFiles = (directory) => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+  const absolutePath = join(directory, entry.name);
+  return entry.isDirectory() ? walkFiles(absolutePath) : [absolutePath];
+});
+
 const walletBuildIndex = "public/wallet-app/index.html";
 if (existsSync(walletBuildIndex)) {
   const manifestPath = "public/wallet-app/build-manifest.json";
@@ -83,8 +109,15 @@ if (existsSync(walletBuildIndex)) {
   }
 
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-  if (manifest.schemaVersion !== 1 || manifest.basePath !== "/wallet-app") {
-    console.error("Integrated wallet build manifest has an unexpected schemaVersion or basePath");
+  if (
+    manifest.schemaVersion !== 1 ||
+    manifest.basePath !== "/wallet-app" ||
+    manifest.network !== "preprod" ||
+    manifest.mainnetSigningEnabled !== false ||
+    typeof manifest.sourceCommit !== "string" ||
+    !manifest.sourceCommit
+  ) {
+    console.error("Integrated wallet build manifest has unexpected release metadata");
     process.exit(1);
   }
 
@@ -93,6 +126,48 @@ if (existsSync(walletBuildIndex)) {
   const invalidReferences = rootReferences.filter((reference) => reference !== "/wallet-app" && !reference.startsWith("/wallet-app/"));
   if (invalidReferences.length) {
     console.error(`Integrated wallet build contains root-relative paths outside /wallet-app:\n${[...new Set(invalidReferences)].join("\n")}`);
+    process.exit(1);
+  }
+
+  const walletFiles = walkFiles("public/wallet-app");
+  const wasmFiles = walletFiles.filter((file) => file.endsWith(".wasm"));
+  if (wasmFiles.length !== 1) {
+    console.error(`Integrated wallet build must contain exactly one WASM file, found ${wasmFiles.length}`);
+    process.exit(1);
+  }
+
+  const wasmRelativePath = relative("public/wallet-app", wasmFiles[0]).split(sep).join("/");
+  if (
+    !wasmRelativePath.startsWith("assets/cardano/cardano_serialization_lib_bg.") ||
+    manifest.wasmPath !== wasmRelativePath
+  ) {
+    console.error(`Integrated wallet build uses an unstable or untracked WASM path: ${wasmRelativePath}`);
+    process.exit(1);
+  }
+  if (statSync(wasmFiles[0]).size < 1_000_000) {
+    console.error("Integrated Cardano WASM is unexpectedly small");
+    process.exit(1);
+  }
+
+  const expectedWasmUrl = `/wallet-app/${wasmRelativePath}`;
+  const wasmReferences = [];
+  for (const javaScriptFile of walletFiles.filter((file) => file.endsWith(".js"))) {
+    const source = readFileSync(javaScriptFile, "utf8");
+    wasmReferences.push(
+      ...[...source.matchAll(/["']([^"']+\.wasm(?:[?#][^"']*)?)["']/gi)].map((match) => match[1]),
+    );
+    if (/["'][^"']*(?:node_modules\/\.pnpm|\.pnpm\/)[^"']*\.wasm["']/i.test(source)) {
+      console.error(`Integrated wallet JavaScript contains an unstable pnpm WASM reference: ${javaScriptFile}`);
+      process.exit(1);
+    }
+  }
+  if (wasmReferences.length < 1) {
+    console.error(`Integrated wallet JavaScript does not reference ${expectedWasmUrl}`);
+    process.exit(1);
+  }
+  const invalidWasmReferences = wasmReferences.filter((reference) => reference !== expectedWasmUrl);
+  if (invalidWasmReferences.length) {
+    console.error(`Integrated wallet JavaScript contains unexpected WASM URLs:\n${invalidWasmReferences.join("\n")}`);
     process.exit(1);
   }
 }

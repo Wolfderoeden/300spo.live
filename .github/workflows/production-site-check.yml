@@ -68,6 +68,10 @@ jobs:
         working-directory: hotwallet
         run: pnpm install --frozen-lockfile
 
+      - name: Capture exact hotwallet source commit
+        working-directory: hotwallet
+        run: echo "WALLET_SOURCE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
       - name: Export hotwallet for /wallet-app
         working-directory: hotwallet
         env:
@@ -77,8 +81,16 @@ jobs:
           EXPO_PUBLIC_WEB_BASE_PATH: /wallet-app
         run: pnpm export:web
 
+      - name: Verify portable wallet export
+        working-directory: hotwallet
+        env:
+          EXPO_PUBLIC_WEB_BASE_PATH: /wallet-app
+        run: pnpm verify:web-export
+
       - name: Integrate and validate export
         working-directory: site/site-live
+        env:
+          WALLET_SOURCE_COMMIT: ${{ env.WALLET_SOURCE_COMMIT }}
         run: |
           node scripts/integrate-wallet-web.mjs ../../hotwallet/dist
           node scripts/check.js

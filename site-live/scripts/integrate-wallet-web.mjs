@@ -96,6 +96,20 @@ const validateCss = async (file, source) => {
   }
 };
 
+const validateJavaScript = async (file, source) => {
+  const javaScript = await readFile(file.absolutePath, "utf8");
+  const references = [...javaScript.matchAll(/["']([^"']+\.wasm(?:[?#][^"']*)?)["']/gi)].map((match) => match[1]);
+
+  for (const reference of references) {
+    if (/(?:node_modules\/\.pnpm|\.pnpm\/)/i.test(reference)) {
+      fail(`WASM reference in ${file.pathFromBase} uses an unstable pnpm path: ${reference}`);
+    }
+    await validateLocalReference(reference, file.absolutePath, source, `WASM reference in ${file.pathFromBase}`);
+  }
+
+  return references.length;
+};
+
 const validateArtifact = async (source) => {
   const sourceMetadata = await lstat(source).catch(() => null);
   if (!sourceMetadata?.isDirectory()) fail(`Wallet export directory not found: ${source}`);
@@ -108,12 +122,30 @@ const validateArtifact = async (source) => {
   const blockedFiles = files.filter(({ pathFromBase }) => /(^|\/)(?:\.env(?:\..*)?|id_rsa|id_ed25519)$|\.(?:pem|p12|pfx|key)$/i.test(pathFromBase));
   if (blockedFiles.length) fail(`Potential secret files found in wallet export:\n${blockedFiles.map((file) => file.pathFromBase).join("\n")}`);
 
+  const wasmFiles = files.filter(({ pathFromBase }) => pathFromBase.endsWith(".wasm"));
+  if (wasmFiles.length !== 1) fail(`Expected exactly one WASM artifact, found ${wasmFiles.length}`);
+  if (!wasmFiles[0].pathFromBase.startsWith("assets/cardano/cardano_serialization_lib_bg.")) {
+    fail(`WASM artifact must use the stable assets/cardano path: ${wasmFiles[0].pathFromBase}`);
+  }
+  const wasmMetadata = await lstat(wasmFiles[0].absolutePath);
+  if (wasmMetadata.size < 1_000_000) fail(`WASM artifact is unexpectedly small: ${wasmMetadata.size} bytes`);
+
+  let wasmReferenceCount = 0;
   for (const file of files) {
     if (extname(file.pathFromBase).toLowerCase() === ".html") await validateHtml(file, source);
     if (extname(file.pathFromBase).toLowerCase() === ".css") await validateCss(file, source);
+    if (extname(file.pathFromBase).toLowerCase() === ".js") {
+      wasmReferenceCount += await validateJavaScript(file, source);
+    }
   }
 
-  return files.length;
+  if (wasmReferenceCount < 1) fail("Wallet JavaScript does not reference the bundled Cardano WASM artifact");
+
+  return {
+    fileCount: files.length,
+    wasmPath: wasmFiles[0].pathFromBase,
+    wasmReferenceCount,
+  };
 };
 
 const integrate = async () => {
@@ -128,7 +160,7 @@ const integrate = async () => {
     fail("Use the original hotwallet dist directory as the source, not public/wallet-app");
   }
 
-  const fileCount = await validateArtifact(source);
+  const validation = await validateArtifact(source);
   await rm(staging, { recursive: true, force: true });
 
   try {
@@ -138,6 +170,10 @@ const integrate = async () => {
       name: "300 Wallet Web",
       basePath: "/wallet-app",
       source: "hotwallet-web-export",
+      sourceCommit: process.env.WALLET_SOURCE_COMMIT?.trim() || "local",
+      network: "preprod",
+      mainnetSigningEnabled: false,
+      wasmPath: validation.wasmPath,
     }, null, 2)}\n`, "utf8");
 
     await rm(destination, { recursive: true, force: true });
@@ -147,7 +183,9 @@ const integrate = async () => {
     throw error;
   }
 
-  console.log(`Integrated ${fileCount} wallet web files at public/wallet-app.`);
+  console.log(
+    `Integrated ${validation.fileCount} wallet web files at public/wallet-app (${validation.wasmReferenceCount} WASM reference).`,
+  );
 };
 
 integrate().catch((error) => {
