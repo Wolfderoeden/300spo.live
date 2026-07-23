@@ -35,6 +35,20 @@ ADMIN_PASSWORD=replace-with-a-strong-password
 
 Production secrets are configured in Sites runtime environment variables.
 
+## Aktuelle Netlify-Produktion
+
+Die derzeit öffentlich unter `https://300spo.live` ausgelieferte statische Netlify-Seite liegt in [`site-live/`](site-live/). Der ältere Vinext/Sites-Quellstand bleibt vorerst im Repository erhalten, damit nichts aus der bisherigen Historie verloren geht.
+
+Lokale Prüfung der aktuellen Produktion:
+
+```bash
+cd site-live
+pnpm install --frozen-lockfile
+pnpm build
+```
+
+Generierte Wallet-Artefakte (`public/wallet-app`, APK und Chrome-ZIP) werden nicht in Git versioniert. Der manuelle CI-Workflow kann den Web-Build aus `Wolfderoeden/hotwallet` integrieren und ein geprüftes Deploy-Artefakt erzeugen.
+
 ## Hosting
 
 The app is built for OpenAI Sites / Cloudflare Workers-compatible hosting with:
